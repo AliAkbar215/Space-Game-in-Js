@@ -1,0 +1,315 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>Document</title>
+
+    <script>
+
+
+
+
+    </script>
+
+    <style>
+        @keyframes rotateAnimation {
+
+            from {
+                transform: rotate(0deg);
+            }
+
+            to {
+                transform: rotate(360deg);
+
+            }
+
+        }
+
+        #appContainer {
+            width: 1000px;
+            height: 700px;
+            border: 1px solid blue;
+            background-image: url(images/back.jpg);
+            background-size: cover;
+        }
+
+        #startBTNCONT {
+            text-align: center;
+            margin-top: 30vh;
+        }
+
+        #startBTNCONT img:hover {
+            opacity: 0.7;
+        }
+
+        #startBTNCONT img {
+            width: 200px;
+            cursor: pointer;
+        }
+
+        #spaceship {
+            width: 100px;
+            position: absolute;
+            border: 1px solid yellow;
+
+        }
+
+        .hide {
+            display: none;
+        }
+
+        .star {
+            border: 1px solid orange;
+            width: 50px;
+            position: absolute;
+            /* animation: rotateAnimation 2s linear;
+            animation-iteration-count: infinite; */
+        }
+
+        #gameScoreCont img {
+            width: 70%;
+        }
+
+        #gameScoreCont {
+            width: 200px;
+        }
+
+        #scoreBox {
+            color: white;
+            display: inline;
+        }
+    </style>
+
+</head>
+
+<body>
+
+    <div id="appContainer">
+
+        <div id="welcomeScreen">
+
+            <div id="startBTNCONT">
+                <img name="" id="startBTN" src="images/start-btn.png" alt="">
+            </div>
+
+        </div>
+
+        <div id="gameScreen" class="hide">
+            this is our game screen
+
+            <img id="spaceship" src="images/spaceship.png" alt="">
+
+            <div id="gameScoreCont">
+
+                <img src="images/score.png" />
+                <h2 id="scoreBox">0</h2>
+            </div>
+
+        </div>
+
+        <div id="gameOverScreen" class="hide">
+            this is our game over screen
+
+            <img src="game-over.png" />
+        </div>
+    </div>
+
+
+    <script>
+
+
+        // Array.prototype.max = function(){
+        //     return Math.max.apply(null, this)
+        // }
+
+        // function faisalabadiRandom () {
+        //     return '0.'+(Date.now() / 10000000000000).toString().split('').reverse().join('');
+        // }
+
+        let game = {
+            chances: 3,
+            stars: 3,
+            point: 5,
+            moveLeft() {
+
+                spaceship.style.left = (spaceship.offsetLeft - 5) + 'px';
+
+            },
+            moveRight() {
+
+                spaceship.style.left = (spaceship.offsetLeft + 5) + 'px';
+
+
+            },
+            moveBottom() {
+
+                spaceship.style.top = (spaceship.offsetTop + 5) + 'px';
+
+
+            },
+            moveUp() {
+
+                spaceship.style.top = (spaceship.offsetTop - 7) + 'px';
+
+
+            },
+            starsLeft() {
+
+
+                return document.getElementsByClassName('star').length;
+
+            },
+            gameOver() {
+
+                gameOverScreen.classList.remove('hide');
+                gameScreen.classList.add('hide');
+
+            },
+            isColliding() {
+
+
+                let stars = document.getElementsByClassName('star');
+
+                for (let star of stars) {
+
+                    let starshipRight = spaceship.offsetLeft + spaceship.width;
+                    let starshipLeft = spaceship.offsetLeft;
+                    let starshipBottom = spaceship.offsetTop + spaceship.offsetHeight;
+                    let spaceshipTop = spaceship.offsetTop;
+
+                    let starRight = star.offsetLeft + star.offsetWidth;
+                    let starBottom = star.offsetTop + star.offsetHeight;
+
+                    if (spaceshipTop < starBottom && starshipLeft < starRight && starshipRight > star.offsetLeft && starshipBottom > star.offsetTop) {
+                        scoreBox.innerText = (+scoreBox.innerText) + this.point;
+                        star.remove();
+
+                        if (scoreBox.innerText == this.stars * this.point) {
+                            this.gameOver();
+                        }
+
+                    }
+
+                }
+
+
+            },
+            createStars() {
+
+                let sWidth = appContainer.offsetWidth;
+
+                for (let i = 0; i < this.stars; i++) {
+
+
+                    let starTag = document.createElement('img')
+                    starTag.src = "./images/star.png";
+                    starTag.className = "star";
+                    starTag.style.left = (Math.random() * appContainer.offsetWidth) + 'px';
+                    starTag.style.top = (Math.random() * appContainer.offsetHeight) + 'px';
+
+                    let pWIdth = Math.round(parseFloat(starTag.style.left));
+
+                    if ((pWIdth + 50) > sWidth) {
+
+                        let diff = (pWIdth + 50) - sWidth;
+
+                        starTag.style.left = (pWIdth - diff) + 'px';
+
+                    }
+
+
+
+                    gameScreen.appendChild(starTag);
+
+
+                }
+
+                // setTimeout(() => {
+
+                //     let sWidth = appContainer.offsetWidth;
+
+                //     document.querySelectorAll('.star').forEach((star) => {
+
+                //         if ((star.offsetLeft + star.offsetWidth) > sWidth) {
+
+                //             let diff = (star.offsetLeft + star.offsetWidth) - sWidth;
+
+                //             star.style.left = (star.offsetLeft - diff) + 'px';
+
+                //         }
+
+
+                //     });
+
+                // }, 100)
+
+            },
+            init() {
+
+                startBTN.onclick = () => {
+
+                    this.startGame();
+
+                }
+
+
+                document.body.onkeydown = (evt) => {
+
+                    switch (evt.keyCode) {
+
+                        case 37:
+                            this.moveLeft();
+                            break;
+
+                        case 38:
+                            this.moveUp();
+                            break;
+
+                        case 39:
+                            this.moveRight();
+                            break;
+
+                        case 40:
+                            this.moveBottom();
+                            break;
+
+
+                    }
+
+
+
+                }
+            },
+            startGame() {
+
+                this.createStars();
+
+                welcomeScreen.classList.add('hide');
+                gameScreen.classList.remove('hide');
+
+
+                setInterval(() => {
+
+                    spaceship.style.top = (spaceship.offsetTop + 1) + 'px';
+                    this.isColliding();
+
+                }, 50);
+
+            }
+        };
+
+
+        game.init();
+
+
+
+
+
+    </script>
+
+</body>
+
+</html>
